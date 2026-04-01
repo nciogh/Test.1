@@ -1,250 +1,271 @@
-import React, { useState, useEffect } from 'react';
-import { AlertCircle, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Estilos Sociales</title>
+    <!-- Cargamos Tailwind CSS para los estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Cargamos los íconos de Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        .slide-up { animation: slideUp 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 pb-16 min-h-screen">
 
-const quartets = [
-  [ { text: "Entusiasta", type: "PR" }, { text: "Decidido", type: "CO" }, { text: "Concienzudo", type: "AN" }, { text: "Leal", type: "FA" } ],
-  [ { text: "Reservado", type: "AN" }, { text: "Simpático", type: "PR" }, { text: "Bondadoso", type: "FA" }, { text: "Intranquilo", type: "CO" } ],
-  [ { text: "Reflexivo", type: "FA" }, { text: "Sociable", type: "PR" }, { text: "Exigente", type: "CO" }, { text: "Prudente", type: "AN" } ],
-  [ { text: "Enérgico", type: "CO" }, { text: "Diplomático, con tacto", type: "AN" }, { text: "Compasivo", type: "FA" }, { text: "Alegre", type: "PR" } ],
-  [ { text: "Servicial", type: "FA" }, { text: "Reflexivo", type: "AN" }, { text: "Hablador", type: "PR" }, { text: "Impulsor, animador", type: "CO" } ],
-  [ { text: "Competitivo", type: "CO" }, { text: "Ecuánime", type: "FA" }, { text: "Sociable", type: "PR" }, { text: "Metódico, concienzudo", type: "AN" } ],
-  [ { text: "Amable, afable", type: "PR" }, { text: "Agresivo", type: "CO" }, { text: "Lógico", type: "AN" }, { text: "Relajado", type: "FA" } ],
-  [ { text: "Controlado, contenido", type: "AN" }, { text: "Simpático", type: "PR" }, { text: "Atento, educado", type: "FA" }, { text: "Cabezota, terco", type: "CO" } ],
-  [ { text: "Animador", type: "PR" }, { text: "Constante, perseverante", type: "FA" }, { text: "Obstinado", type: "CO" }, { text: "Meticuloso", type: "AN" } ],
-  [ { text: "Directo", type: "CO" }, { text: "Alegre", type: "PR" }, { text: "Diplomático", type: "FA" }, { text: "Considerado, respetuoso", type: "AN" } ]
-];
+    <!-- Contenedor principal donde JavaScript renderizará la App -->
+    <div id="app"></div>
 
-export default function App() {
-  // Inicializamos el estado para almacenar las respuestas (10 grupos, 4 respuestas cada uno)
-  const [scores, setScores] = useState(
-    Array(10).fill(null).map(() => ({ 0: '', 1: '', 2: '', 3: '' }))
-  );
-  
-  const [error, setError] = useState('');
-  const [showResults, setShowResults] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
-  const [totals, setTotals] = useState({ CO: 0, PR: 0, FA: 0, AN: 0 });
+    <script>
+        // Datos del test
+        const quartets = [
+            [ { text: "Entusiasta", type: "PR" }, { text: "Decidido", type: "CO" }, { text: "Concienzudo", type: "AN" }, { text: "Leal", type: "FA" } ],
+            [ { text: "Reservado", type: "AN" }, { text: "Simpático", type: "PR" }, { text: "Bondadoso", type: "FA" }, { text: "Intranquilo", type: "CO" } ],
+            [ { text: "Reflexivo", type: "FA" }, { text: "Sociable", type: "PR" }, { text: "Exigente", type: "CO" }, { text: "Prudente", type: "AN" } ],
+            [ { text: "Enérgico", type: "CO" }, { text: "Diplomático, con tacto", type: "AN" }, { text: "Compasivo", type: "FA" }, { text: "Alegre", type: "PR" } ],
+            [ { text: "Servicial", type: "FA" }, { text: "Reflexivo", type: "AN" }, { text: "Hablador", type: "PR" }, { text: "Impulsor, animador", type: "CO" } ],
+            [ { text: "Competitivo", type: "CO" }, { text: "Ecuánime", type: "FA" }, { text: "Sociable", type: "PR" }, { text: "Metódico, concienzudo", type: "AN" } ],
+            [ { text: "Amable, afable", type: "PR" }, { text: "Agresivo", type: "CO" }, { text: "Lógico", type: "AN" }, { text: "Relajado", type: "FA" } ],
+            [ { text: "Controlado, contenido", type: "AN" }, { text: "Simpático", type: "PR" }, { text: "Atento, educado", type: "FA" }, { text: "Cabezota, terco", type: "CO" } ],
+            [ { text: "Animador", type: "PR" }, { text: "Constante, perseverante", type: "FA" }, { text: "Obstinado", type: "CO" }, { text: "Meticuloso", type: "AN" } ],
+            [ { text: "Directo", type: "CO" }, { text: "Alegre", type: "PR" }, { text: "Diplomático", type: "FA" }, { text: "Considerado, respetuoso", type: "AN" } ]
+        ];
 
-  // Maneja la selección de un número
-  const handleSelect = (groupIndex, adjIndex, num) => {
-    const newScores = [...scores];
-    
-    // Si hace clic en el mismo número, lo desmarca
-    if (newScores[groupIndex][adjIndex] === num) {
-      newScores[groupIndex][adjIndex] = '';
-    } else {
-      // Si el número ya estaba en otro adjetivo del mismo grupo, lo quita de allí (previene duplicados)
-      Object.keys(newScores[groupIndex]).forEach(key => {
-        if (newScores[groupIndex][key] === num) {
-          newScores[groupIndex][key] = '';
-        }
-      });
-      // Asigna el nuevo número
-      newScores[groupIndex][adjIndex] = num;
-    }
-    
-    setScores(newScores);
-    setError('');
-    setShowResults(false);
-  };
+        // Estado de la aplicación
+        let scores = Array(10).fill(null).map(() => ({ 0: '', 1: '', 2: '', 3: '' }));
+        let errorMsg = '';
+        let showResults = false;
+        let showDetails = false;
+        let totals = { CO: 0, PR: 0, FA: 0, AN: 0 };
 
-  const calculateResults = () => {
-    // Validación: verificar que todos los grupos estén completos
-    for (let i = 0; i < 10; i++) {
-      const group = scores[i];
-      const values = Object.values(group).filter(v => v !== '');
-      if (values.length !== 4) {
-        setError(`Por favor, completa todas las opciones en el Grupo ${i + 1}. Faltan asignar números.`);
-        // Hacer scroll suave hacia el error
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-    }
-
-    // Calcular totales
-    const newTotals = { CO: 0, PR: 0, FA: 0, AN: 0 };
-    scores.forEach((group, gIndex) => {
-      Object.entries(group).forEach(([aIndex, val]) => {
-        const type = quartets[gIndex][aIndex].type;
-        newTotals[type] += val;
-      });
-    });
-
-    setTotals(newTotals);
-    setShowResults(true);
-    setError('');
-    
-    // Scroll hacia los resultados
-    setTimeout(() => {
-      document.getElementById('resultados-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
-  // Calcula el progreso para la barra superior
-  const getProgress = () => {
-    let answered = 0;
-    scores.forEach(group => {
-      answered += Object.values(group).filter(v => v !== '').length;
-    });
-    return (answered / 40) * 100;
-  };
-
-  return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-16 font-sans">
-      {/* Barra de progreso fija arriba */}
-      <div className="fixed top-0 left-0 w-full h-1.5 bg-slate-200 z-50">
-        <div 
-          className="h-full bg-blue-600 transition-all duration-300 ease-out"
-          style={{ width: `${getProgress()}%` }}
-        ></div>
-      </div>
-
-      <div className="max-w-4xl mx-auto pt-12 px-4 sm:px-6">
-        
-        <header className="text-center mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-4">
-            Test de Estilos Sociales
-          </h1>
-          <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-            Establece un ranking en cada grupo de adjetivos. Selecciona <strong className="text-slate-700">4</strong> para el que más te describe, hasta <strong className="text-slate-700">1</strong> para el que menos. Usa cada número una sola vez por grupo.
-          </p>
-        </header>
-
-        {error && (
-          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700 animate-in fade-in">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <p className="font-medium text-sm">{error}</p>
-          </div>
-        )}
-
-        <div className="flex flex-col gap-6 max-w-2xl mx-auto">
-          {quartets.map((group, gIndex) => {
-            const isGroupComplete = Object.values(scores[gIndex]).filter(v => v !== '').length === 4;
+        // Función para manejar la selección de botones
+        function handleSelect(gIndex, aIndex, num) {
+            if (scores[gIndex][aIndex] === num) {
+                // Desmarcar si se clickea el mismo número
+                scores[gIndex][aIndex] = '';
+            } else {
+                // Quitar el número de otra opción en el mismo grupo para evitar duplicados
+                Object.keys(scores[gIndex]).forEach(key => {
+                    if (scores[gIndex][key] === num) {
+                        scores[gIndex][key] = '';
+                    }
+                });
+                // Asignar el nuevo número
+                scores[gIndex][aIndex] = num;
+            }
             
-            return (
-              <div 
-                key={gIndex} 
-                className={`bg-white rounded-2xl p-6 shadow-sm border transition-colors duration-300 ${isGroupComplete ? 'border-green-200 bg-green-50/10' : 'border-slate-200'}`}
-              >
-                <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    Grupo {gIndex + 1}
-                  </h3>
-                  {isGroupComplete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+            errorMsg = '';
+            showResults = false;
+            render();
+        }
+
+        // Función para calcular resultados
+        function calculateResults() {
+            // Validación
+            for (let i = 0; i < 10; i++) {
+                const group = scores[i];
+                const values = Object.values(group).filter(v => v !== '');
+                if (values.length !== 4) {
+                    errorMsg = `Por favor, completa todas las opciones en el Grupo ${i + 1}. Faltan asignar números.`;
+                    render();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+            }
+
+            // Calcular totales
+            totals = { CO: 0, PR: 0, FA: 0, AN: 0 };
+            scores.forEach((group, gIndex) => {
+                Object.entries(group).forEach(([aIndex, val]) => {
+                    const type = quartets[gIndex][aIndex].type;
+                    totals[type] += val;
+                });
+            });
+
+            showResults = true;
+            errorMsg = '';
+            render();
+            
+            // Hacer scroll hacia resultados
+            setTimeout(() => {
+                document.getElementById('resultados-section')?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        function toggleDetails() {
+            showDetails = !showDetails;
+            render();
+        }
+
+        function getProgress() {
+            let answered = 0;
+            scores.forEach(group => {
+                answered += Object.values(group).filter(v => v !== '').length;
+            });
+            return (answered / 40) * 100;
+        }
+
+        // Función principal que dibuja la interfaz
+        function render() {
+            const app = document.getElementById('app');
+            
+            let html = `
+                <!-- Barra de progreso -->
+                <div class="fixed top-0 left-0 w-full h-1.5 bg-slate-200 z-50">
+                    <div class="h-full bg-blue-600 transition-all duration-300 ease-out" style="width: ${getProgress()}%"></div>
                 </div>
+
+                <div class="max-w-4xl mx-auto pt-12 px-4 sm:px-6">
+                    <header class="text-center mb-10">
+                        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-4">
+                            Test de Estilos Sociales
+                        </h1>
+                        <p class="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+                            Establece un ranking en cada grupo de adjetivos. Selecciona <strong class="text-slate-700">4</strong> para el que más te describe, hasta <strong class="text-slate-700">1</strong> para el que menos. Usa cada número una sola vez por grupo.
+                        </p>
+                    </header>
+            `;
+
+            if (errorMsg) {
+                html += `
+                    <div class="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700 fade-in">
+                        <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                        <p class="font-medium text-sm">${errorMsg}</p>
+                    </div>
+                `;
+            }
+
+            html += `<div class="flex flex-col gap-6 max-w-2xl mx-auto">`;
+
+            quartets.forEach((group, gIndex) => {
+                const isGroupComplete = Object.values(scores[gIndex]).filter(v => v !== '').length === 4;
+                const borderClass = isGroupComplete ? 'border-green-200 bg-green-50/10' : 'border-slate-200';
                 
-                <div className="space-y-4">
-                  {group.map((adj, aIndex) => (
-                    <div key={aIndex} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <label className="text-sm font-medium text-slate-700 flex-1">
-                        {adj.text}
-                      </label>
-                      <div className="flex gap-1.5 shrink-0">
-                        {[1, 2, 3, 4].map(num => {
-                          const isSelected = scores[gIndex][aIndex] === num;
-                          // Check if this number is selected somewhere else in this group
-                          const isUsedInGroup = Object.values(scores[gIndex]).includes(num);
-                          
-                          return (
-                            <button
-                              key={num}
-                              onClick={() => handleSelect(gIndex, aIndex, num)}
-                              className={`
-                                w-10 h-10 sm:w-9 sm:h-9 rounded-full text-sm font-semibold transition-all duration-200
-                                flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500
-                                ${isSelected 
-                                  ? 'bg-blue-600 text-white shadow-md scale-105' 
-                                  : isUsedInGroup
-                                    ? 'bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100' // Number used in another row
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                                }
-                              `}
-                            >
-                              {num}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
+                html += `
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border transition-colors duration-300 ${borderClass}">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Grupo ${gIndex + 1}</h3>
+                            ${isGroupComplete ? `<i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>` : ''}
+                        </div>
+                        <div class="space-y-4">
+                `;
+
+                group.forEach((adj, aIndex) => {
+                    html += `
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <label class="text-sm font-medium text-slate-700 flex-1">${adj.text}</label>
+                            <div class="flex gap-1.5 shrink-0">
+                    `;
+
+                    [1, 2, 3, 4].forEach(num => {
+                        const isSelected = scores[gIndex][aIndex] === num;
+                        const isUsedInGroup = Object.values(scores[gIndex]).includes(num);
+                        
+                        let btnClass = "w-10 h-10 sm:w-9 sm:h-9 rounded-full text-sm font-semibold transition-all duration-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 ";
+                        
+                        if (isSelected) {
+                            btnClass += "bg-blue-600 text-white shadow-md scale-105";
+                        } else if (isUsedInGroup) {
+                            btnClass += "bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100";
+                        } else {
+                            btnClass += "bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-800";
+                        }
+
+                        html += `<button onclick="handleSelect(${gIndex}, ${aIndex}, ${num})" class="${btnClass}">${num}</button>`;
+                    });
+
+                    html += `</div></div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            html += `
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-12 flex flex-col items-center">
-          <button
-            onClick={calculateResults}
-            className="bg-slate-900 hover:bg-slate-800 text-white font-medium py-3.5 px-10 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto text-lg flex items-center justify-center gap-2"
-          >
-            Generar Resultados
-          </button>
-        </div>
-
-        {/* Sección de Resultados */}
-        {showResults && (
-          <div id="resultados-section" className="mt-16 animate-in slide-in-from-bottom-8 fade-in duration-500">
-            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-              <h2 className="text-2xl font-bold mb-8 text-center text-slate-800">Tus Resultados Finales</h2>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                {[
-                  { id: 'CO', color: 'bg-blue-50 border-blue-100 text-blue-700', label: 'CO' },
-                  { id: 'PR', color: 'bg-emerald-50 border-emerald-100 text-emerald-700', label: 'PR' },
-                  { id: 'FA', color: 'bg-amber-50 border-amber-100 text-amber-700', label: 'FA' },
-                  { id: 'AN', color: 'bg-purple-50 border-purple-100 text-purple-700', label: 'AN' }
-                ].map(type => (
-                  <div key={type.id} className={`${type.color} border rounded-2xl p-6 text-center flex flex-col items-center justify-center`}>
-                    <span className="text-sm font-bold opacity-70 mb-1">{type.label}</span>
-                    <span className="text-4xl font-black">{totals[type.id]}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Botón secundario para ver detalles */}
-              <div className="mt-10 border-t border-slate-100 pt-6 text-center">
-                <button
-                  onClick={() => setShowDetails(!showDetails)}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
-                >
-                  {showDetails ? 'Ocultar detalle de respuestas' : 'Ver detalle de mis respuestas'}
-                  {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
-              </div>
-
-              {/* Acordeón de detalles */}
-              {showDetails && (
-                <div className="mt-6 text-sm text-slate-600 bg-slate-50 rounded-xl p-6 border border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
-                  {quartets.map((group, gIndex) => (
-                    <div key={`detail-${gIndex}`}>
-                      <h4 className="font-semibold text-slate-800 mb-2 border-b border-slate-200 pb-1">Grupo {gIndex + 1}</h4>
-                      <ul className="space-y-1.5">
-                        {/* Sort by score descending (4 to 1) for better readability */}
-                        {[4, 3, 2, 1].map(num => {
-                          const adjIndex = Object.keys(scores[gIndex]).find(key => scores[gIndex][key] === num);
-                          if (adjIndex !== undefined) {
-                            const adj = group[adjIndex];
-                            return (
-                              <li key={num} className="flex justify-between items-center">
-                                <span><span className="font-medium text-slate-400 mr-2">{num}</span> {adj.text}</span>
-                                <span className="text-xs font-bold px-2 py-0.5 bg-slate-200 rounded text-slate-600">{adj.type}</span>
-                              </li>
-                            );
-                          }
-                          return null;
-                        })}
-                      </ul>
-                    </div>
-                  ))}
+                <div class="mt-12 flex flex-col items-center">
+                    <button onclick="calculateResults()" class="bg-slate-900 hover:bg-slate-800 text-white font-medium py-3.5 px-10 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 w-full sm:w-auto text-lg flex items-center justify-center gap-2">
+                        Generar Resultados
+                    </button>
                 </div>
-              )}
+            `;
 
-            </div>
-          </div>
-        )}
+            if (showResults) {
+                html += `
+                    <div id="resultados-section" class="mt-16 slide-up fade-in">
+                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                            <h2 class="text-2xl font-bold mb-8 text-center text-slate-800">Tus Resultados Finales</h2>
+                            
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                                <div class="bg-blue-50 border border-blue-100 text-blue-700 rounded-2xl p-6 text-center flex flex-col items-center justify-center">
+                                    <span class="text-sm font-bold opacity-70 mb-1">CO</span>
+                                    <span class="text-4xl font-black">${totals['CO']}</span>
+                                </div>
+                                <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-2xl p-6 text-center flex flex-col items-center justify-center">
+                                    <span class="text-sm font-bold opacity-70 mb-1">PR</span>
+                                    <span class="text-4xl font-black">${totals['PR']}</span>
+                                </div>
+                                <div class="bg-amber-50 border border-amber-100 text-amber-700 rounded-2xl p-6 text-center flex flex-col items-center justify-center">
+                                    <span class="text-sm font-bold opacity-70 mb-1">FA</span>
+                                    <span class="text-4xl font-black">${totals['FA']}</span>
+                                </div>
+                                <div class="bg-purple-50 border border-purple-100 text-purple-700 rounded-2xl p-6 text-center flex flex-col items-center justify-center">
+                                    <span class="text-sm font-bold opacity-70 mb-1">AN</span>
+                                    <span class="text-4xl font-black">${totals['AN']}</span>
+                                </div>
+                            </div>
 
-      </div>
-    </div>
-  );
-}
+                            <div class="mt-10 border-t border-slate-100 pt-6 text-center">
+                                <button onclick="toggleDetails()" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
+                                    ${showDetails ? 'Ocultar detalle de respuestas' : 'Ver detalle de mis respuestas'}
+                                    <i data-lucide="${showDetails ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                `;
+
+                if (showDetails) {
+                    html += `<div class="mt-6 text-sm text-slate-600 bg-slate-50 rounded-xl p-6 border border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">`;
+                    
+                    quartets.forEach((group, gIndex) => {
+                        html += `<div><h4 class="font-semibold text-slate-800 mb-2 border-b border-slate-200 pb-1">Grupo ${gIndex + 1}</h4><ul class="space-y-1.5">`;
+                        
+                        [4, 3, 2, 1].forEach(num => {
+                            const adjIndex = Object.keys(scores[gIndex]).find(key => scores[gIndex][key] === num);
+                            if (adjIndex !== undefined) {
+                                const adj = group[adjIndex];
+                                html += `
+                                    <li class="flex justify-between items-center">
+                                        <span><span class="font-medium text-slate-400 mr-2">${num}</span> ${adj.text}</span>
+                                        <span class="text-xs font-bold px-2 py-0.5 bg-slate-200 rounded text-slate-600">${adj.type}</span>
+                                    </li>
+                                `;
+                            }
+                        });
+                        
+                        html += `</ul></div>`;
+                    });
+                    
+                    html += `</div>`;
+                }
+
+                html += `</div></div>`;
+            }
+
+            html += `</div>`;
+
+            // Insertar el HTML en el DOM
+            app.innerHTML = html;
+            
+            // Renderizar los íconos
+            lucide.createIcons();
+        }
+
+        // Renderizado inicial al cargar la página
+        window.onload = render;
+    </script>
+</body>
+</html>
